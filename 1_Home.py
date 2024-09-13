@@ -1,6 +1,6 @@
 import streamlit as st
-from utils import *
-from messages import *
+from functions.utils import *
+from functions.messages import *
 import numpy as np
 
 def Home():

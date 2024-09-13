@@ -8,7 +8,7 @@ def response_generator(response):
         yield word + " "
         time.sleep(0.15)
 
-USER_DATA_FILE = 'users_data.csv'
+USER_DATA_FILE = 'Data/users_data.csv'
 
 def check_file():
     if not os.path.exists(USER_DATA_FILE):
