@@ -26,3 +26,10 @@ To begin interacting with Chad-Bot, please log in to your account or register if
 Once you're in, you'll have access to personalized AI-driven assistance, tailored responses, and much more!
 
 """
+
+G_chat = """
+To enable interactive Graphs, please Upload dataset in the Dataset Tab. 
+
+Once you have done that, you'll have access to graphs and data itself, and much more!
+
+"""

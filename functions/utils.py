@@ -1,16 +1,17 @@
 import time
+from sklearn.preprocessing import LabelEncoder
 import streamlit as st
 import pandas as pd
 import numpy as np
 import os
 import io
 
+USER_DATA_FILE = 'Data/users_data.csv'
+
 def response_generator(response):
     for word in response.split():
         yield word + " "
         time.sleep(0.15)
-
-USER_DATA_FILE = 'Data/users_data.csv'
 
 def check_file():
     if not os.path.exists(USER_DATA_FILE):
@@ -48,8 +49,10 @@ def df_info(df):
     info_df.drop(columns=['index'], axis=1, inplace=True)
     return info_df
 
-def dataframe_with_selections(df, init_value=False):
-    df = df_info(df)
+def dataframe_with_selections(df_org, init_value=False):
+    df = df_info(df_org)
+    if 'df' not in st.session_state or st.session_state.df is None:
+        st.session_state.df = df_org.copy()
     df_with_selections = df.copy()
     df_with_selections.insert(0, "Select", init_value)
 
@@ -65,9 +68,38 @@ def dataframe_with_selections(df, init_value=False):
     # Filter the dataframe using the temporary column, then drop the column
     selected_rows = edited_df[edited_df.Select]
 
+    options = ['None']
+    options.extend(['Label Encoder', 'Embbedings', 'Drop', 'Fillnan', 'Drop-NaN'])
+
     option = st.selectbox(
     "Select Preprocessing technique:",
-    ['Label Encoder', 'Embbedings'],
+    options,
     )
-    if st.button('Process'):
-        st.write(np.array(selected_rows['Column']))
+
+    c1, c2 = st.columns([.8, .2])
+
+    with c1:
+        if st.button('Process'):
+            if option == 'Label Encoder':
+                lb = LabelEncoder()
+                for i in selected_rows['Column']:
+                    try:
+                        st.session_state.df[i]/2
+                    except:
+                        st.session_state.df[i] = lb.fit_transform(st.session_state.df[i])
+
+            elif option == 'Drop':
+                st.session_state.df.drop(selected_rows['Column'], axis=1, inplace=True)
+
+            elif option == 'Drop-NaN':
+                st.session_state.df.dropna(axis=0, how='any', inplace=True)
+
+    with c2:
+        if st.button('Reset'):
+            st.session_state.df = None
+    
+    st.write("### Input Dataset Preview")
+    try:
+        st.dataframe(st.session_state.df)
+    except:
+        st.dataframe(pd.DataFrame({}))

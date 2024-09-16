@@ -17,13 +17,15 @@ def data_visulization():
     with col2:
         if st.button("Remove Dataset"):
             st.session_state.uploaded_file = False
+            st.session_state.df = None
             st.rerun()
 
     df = pd.read_csv(f'./Data/{st.session_state.uploaded_file}')
-    
+    options = ['None']
+    options.extend(df.columns)
     option = st.selectbox(
     "Select Prediction Cloumn:",
-    df.columns,
+    options,
     )
     
     st.dataframe(df.head())
@@ -31,7 +33,10 @@ def data_visulization():
     st.write("### Statistical Summary:")
     st.write(df.describe())
 
-    dataframe_with_selections(df)
+    try:
+        dataframe_with_selections(df.drop(columns=option, axis=1))
+    except Exception as e:
+        st.warning('Please select a prediction Column to fully unlock the Dataset Funcationalities!', icon='🚨')
 
 def data_upload():
     st.set_page_config(page_title="Upload Dataset", page_icon="📊")
