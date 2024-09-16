@@ -1,7 +1,9 @@
 import time
 import streamlit as st
 import pandas as pd
+import numpy as np
 import os
+import io
 
 def response_generator(response):
     for word in response.split():
@@ -33,3 +35,39 @@ def sign_up_user(username, password):
         result = pd.concat([users, new_user], axis=0)
         result.to_csv(USER_DATA_FILE, index=False)
         st.success(f"User {username} registered successfully!")
+
+def df_info(df):
+    buffer = io.StringIO ()
+    df.info (buf=buffer)
+    lines = buffer.getvalue().split('\n')
+    list_of_list = []
+    for x in lines [5:-3]:
+        list = x.split ()
+        list_of_list.append(list)
+    info_df = pd.DataFrame(list_of_list, columns=['index', 'Column', 'Non-null-Count', 'null', 'Dtype'])
+    info_df.drop(columns=['index'], axis=1, inplace=True)
+    return info_df
+
+def dataframe_with_selections(df, init_value=False):
+    df = df_info(df)
+    df_with_selections = df.copy()
+    df_with_selections.insert(0, "Select", init_value)
+
+    st.write("### Dataset info:")
+    # Get dataframe row-selections from user with st.data_editor
+    edited_df = st.data_editor(
+        df_with_selections,
+        hide_index=True,
+        column_config={"Select": st.column_config.CheckboxColumn(required=True)},
+        disabled=df.columns,
+    )
+
+    # Filter the dataframe using the temporary column, then drop the column
+    selected_rows = edited_df[edited_df.Select]
+
+    option = st.selectbox(
+    "Select Preprocessing technique:",
+    ['Label Encoder', 'Embbedings'],
+    )
+    if st.button('Process'):
+        st.write(np.array(selected_rows['Column']))

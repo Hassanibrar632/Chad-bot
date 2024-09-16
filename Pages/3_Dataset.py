@@ -7,9 +7,9 @@ import streamlit as st
 from functions.utils import *
 from functions.messages import *
 import pandas as pd
-import io
 
 def data_visulization():
+    st.set_page_config(page_title="Upload Dataset", page_icon="📊")
 
     col1, col2 = st.columns([.8, .2])
     with col1:
@@ -18,24 +18,20 @@ def data_visulization():
         if st.button("Remove Dataset"):
             st.session_state.uploaded_file = False
             st.rerun()
-    
+
     df = pd.read_csv(f'./Data/{st.session_state.uploaded_file}')
-    st.dataframe(df.head())
     
-    st.write("### Dataset info:")
-    buffer = io.StringIO ()
-    df.info (buf=buffer)
-    lines = buffer.getvalue().split('\n')
-    list_of_list = []
-    for x in lines [5:-3]:
-        list = x.split ()
-        list_of_list.append(list)
-    info_df = pd.DataFrame(list_of_list, columns=['index', 'Column', 'Non-null-Count', 'null', 'Dtype'])
-    info_df.drop(columns=['index'], axis=1, inplace=True)
-    st.dataframe(info_df)
+    option = st.selectbox(
+    "Select Prediction Cloumn:",
+    df.columns,
+    )
+    
+    st.dataframe(df.head())
 
     st.write("### Statistical Summary:")
     st.write(df.describe())
+
+    dataframe_with_selections(df)
 
 def data_upload():
     st.set_page_config(page_title="Upload Dataset", page_icon="📊")
