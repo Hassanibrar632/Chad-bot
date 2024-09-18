@@ -23,20 +23,37 @@ def data_visulization():
     df = pd.read_csv(f'./Data/{st.session_state.uploaded_file}')
     options = ['None']
     options.extend(df.columns)
+
+    index = 0
+    try:
+        if 'option' in st.session_state and st.session_state.option != ['None']:
+            index = options.index(st.session_state.option)
+    except:
+        pass
+
     option = st.selectbox(
     "Select Prediction Cloumn:",
-    options,
+    options, index=index
     )
+
+    if option == 'None':
+        st.warning("Warning: Please setect the Target column.", icon="🚨")
+
+    
+    st.session_state.option = option
     
     st.dataframe(df.head())
+
+    st.write("### Missing Values")
+    st.write(df.isnull().sum())
 
     st.write("### Statistical Summary:")
     st.write(df.describe())
 
     try:
-        dataframe_with_selections(df.drop(columns=option, axis=1))
+        dataframe_with_selections(df)
     except Exception as e:
-        st.warning('Please select a prediction Column to fully unlock the Dataset Funcationalities!', icon='🚨')
+        st.warning(f'Error {e}', icon='🚨')
 
 def data_upload():
     st.set_page_config(page_title="Upload Dataset", page_icon="📊")

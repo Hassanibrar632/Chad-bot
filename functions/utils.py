@@ -50,9 +50,9 @@ def df_info(df):
     return info_df
 
 def dataframe_with_selections(df_org, init_value=False):
-    df = df_info(df_org)
     if 'df' not in st.session_state or st.session_state.df is None:
         st.session_state.df = df_org.copy()
+    df = df_info(st.session_state.df)
     df_with_selections = df.copy()
     df_with_selections.insert(0, "Select", init_value)
 
@@ -89,7 +89,10 @@ def dataframe_with_selections(df_org, init_value=False):
                         st.session_state.df[i] = lb.fit_transform(st.session_state.df[i])
 
             elif option == 'Drop':
-                st.session_state.df.drop(selected_rows['Column'], axis=1, inplace=True)
+                try:
+                    st.session_state.df.drop(selected_rows['Column'], axis=1, inplace=True)
+                except Exception as e:
+                    st.error(f'Error: {e}')
 
             elif option == 'Drop-NaN':
                 st.session_state.df.dropna(axis=0, how='any', inplace=True)
