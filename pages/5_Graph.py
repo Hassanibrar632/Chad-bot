@@ -47,14 +47,6 @@ def Graph_visulization():
         st.error(f'Error: {e}', icon='🚨')
 
     try:
-        st.write("### Box Plot for Numerical Columns")
-        columns = df.columns
-        df[columns].plot(kind='box', subplots=True, layout=(len(columns), 1), figsize=(12, len(columns)*4))
-        st.pyplot(plt.gcf())
-    except Exception as e:
-        st.error(f'Error: {e}', icon='🚨')
-
-    try:
         if target_type == 'categorical':
             st.write("### Violin Plot with Target Column")
             for col in df.columns:
