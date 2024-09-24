@@ -3,7 +3,6 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-
 import streamlit as st
 from functions.utils import *
 from functions.messages import *
@@ -37,7 +36,6 @@ def Chat():
         with st.chat_message("assistant"):
             response = st.write_stream(response_generator(response))
         st.session_state.messages.append({"role": "assistant", "content": response})
-
 
 if 'Logged' not in st.session_state or st.session_state.Logged == False:
     st.session_state.Logged = False
