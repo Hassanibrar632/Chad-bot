@@ -4,7 +4,7 @@ import time
 
 if 'Logged' not in st.session_state:
     st.session_state.Logged = False
-    st.session_state.user = 0
+    st.session_state.user = None
 
 greeting = """
 Hello Temp, welcome back! Here, you can review and update your personal details, track your progress, and customize your experience.
@@ -20,27 +20,31 @@ def response_generator(name):
 def Profile():
     st.set_page_config(page_title="Profile Page", page_icon="🕴️")
     temp = requests.get(url=f"http://127.0.0.1:8000/user/get/{st.session_state['user']}")
-    data = temp.json()
-    if data.get('result'):
-        data = data.get('user')
-        email = data['email']
-        user = data['User']
-        first_name = data['First_Name']
-        last_name = data['Last_Name']
+    try:
+        data = temp.json()
+        if data.get('result'):
+            data = data.get('user')
+            email = data['email']
+            user = data['user']
+            first_name = data['first_name']
+            last_name = data['last_name']
 
-        st.title(f"{user} Profile: ")
-        st.header(f"{email}")
-        with st.chat_message("assistant"):
-            st.write_stream(response_generator(f"{first_name} {last_name}"))
+            st.title(f"{user} Profile: ")
+            st.header(f"{email}")
+            with st.chat_message("assistant"):
+                st.write_stream(response_generator(f"{first_name} {last_name}"))
 
-        _, col2, _ = st.columns([.4, .2, .4])
+            _, col2, _ = st.columns([.4, .2, .4])
 
-        with col2:
-            if st.button("Log out"):
-                st.session_state['user'] = False
-                st.rerun()
-    else:
-        st.error(data.get('error'), icon="🚨")
+            with col2:
+                if st.button("Log out"):
+                    st.session_state['Logged'] = False
+                    st.session_state.user = None
+                    st.rerun()
+        else:
+            st.error(data.get('error'), icon="🚨")
+    except Exception as w:
+        st.warning(w, icon="🚨")
 def Login():
     st.set_page_config(page_title="Login Page", page_icon="🔒")
 
